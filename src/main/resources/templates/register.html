@@ -5,30 +5,34 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register</title>
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #73a5ff, #5477f5);
+        * {
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #73a5ff, #5477f5);
+            height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            color: white;
         }
 
-        .register-container {
+        .container {
             background-color: rgba(255, 255, 255, 0.9);
-            padding: 40px;
-            border-radius: 15px;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-            width: 400px;
+            padding: 50px 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
         }
 
         h2 {
-            text-align: center;
-            margin-bottom: 30px;
             color: #333;
+            margin-bottom: 20px;
+            text-align: center;
             font-size: 2em;
         }
 
@@ -49,9 +53,9 @@
             width: 100%;
             padding: 15px;
             box-sizing: border-box;
-            border: 2px solid #ccc;
+            border: 1px solid #ccc;
             border-radius: 8px;
-            font-size: 1.1em;
+            font-size: 1em;
             background-color: #f9f9f9;
         }
 
@@ -69,8 +73,7 @@
             color: white;
             border: none;
             border-radius: 8px;
-            font-size: 1.3em;
-            font-weight: bold;
+            font-size: 1.2em;
             cursor: pointer;
             transition: background-color 0.3s ease;
         }
@@ -78,11 +81,25 @@
         .register-btn:hover {
             background-color: #3a59d4;
         }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 30px 20px;
+            }
+
+            h2 {
+                font-size: 1.6em;
+            }
+
+            .register-btn {
+                font-size: 1.1em;
+            }
+        }
     </style>
 </head>
 <body>
 
-<div class="register-container">
+<div class="container">
     <h2>Create an Account</h2>
     <form id="registrationForm">
         <div class="input-group">
@@ -124,7 +141,6 @@
         .then(response => {
             if (response.ok) {
                 alert('Registration successful!');
-                // Optionally redirect to another page
                 window.location.href = '/login'; // Redirect to the login page
             } else {
                 alert('Registration failed. Please try again.');

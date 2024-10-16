@@ -1,8 +1,8 @@
 package com.sonusharma.spring_security.config;
 
-
 import com.sonusharma.spring_security.handler.CustomAuthenticationSuccessHandler;
 import com.sonusharma.spring_security.service.MyUserDetailService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,6 +20,7 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 
 @Configuration
 @EnableWebSecurity
+@Slf4j
 public class SecurityConfig {
 
     @Autowired
@@ -27,10 +28,11 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
+        log.info("Configuring security filter chain.");
         return httpSecurity
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(registry -> {
-                    registry.requestMatchers("/health", "/home", "/app/**").permitAll();
+                    registry.requestMatchers("/health", "/home", "/app/**", "/register/**").permitAll();
                     registry.requestMatchers("/admin/**").hasRole("ADMIN");
                     registry.requestMatchers("/user/**").hasRole("USER");
                     registry.anyRequest().authenticated();
@@ -46,20 +48,21 @@ public class SecurityConfig {
                 .build();
     }
 
-
     @Bean
     public AuthenticationSuccessHandler authenticationSuccessHandler() {
+        log.info("Creating custom authentication success handler.");
         return new CustomAuthenticationSuccessHandler();
     }
 
-
     @Bean
     public UserDetailsService userDetailsService() {
+        log.info("Providing user details service.");
         return myUserDetailService;
     }
 
     @Bean
     public AuthenticationProvider authenticationProvider() {
+        log.info("Creating authentication provider.");
         DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
         authenticationProvider.setUserDetailsService(myUserDetailService);
         authenticationProvider.setPasswordEncoder(passwordEncoder());
@@ -68,6 +71,7 @@ public class SecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
+        log.info("Creating password encoder.");
         return new BCryptPasswordEncoder();
     }
 }
