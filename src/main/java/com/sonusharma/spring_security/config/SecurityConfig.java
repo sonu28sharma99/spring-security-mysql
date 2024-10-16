@@ -1,6 +1,7 @@
 package com.sonusharma.spring_security.config;
 
 
+import com.sonusharma.spring_security.handler.CustomAuthenticationSuccessHandler;
 import com.sonusharma.spring_security.service.MyUserDetailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -10,12 +11,12 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractAuthenticationFilterConfigurer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
 @Configuration
 @EnableWebSecurity
@@ -35,39 +36,30 @@ public class SecurityConfig {
                     registry.anyRequest().authenticated();
                 })
                 .formLogin(httpSecurityFormLoginConfigurer -> {
-                    httpSecurityFormLoginConfigurer.loginPage("/login").permitAll();
+                    httpSecurityFormLoginConfigurer
+                            .loginPage("/login")
+                            .successHandler(authenticationSuccessHandler()) // Use the bean here
+                            .failureUrl("/login?error=true") // Redirect on failure
+                            .permitAll();
                 })
                 .httpBasic(Customizer.withDefaults())
                 .build();
     }
 
-    /*
-                        USING IN MEMORY USERS
-     */
-//    @Bean
-//    public UserDetailsService userDetailsService(){
-//        UserDetails normalUser = User.builder()
-//                .username("user")
-//                .password("$2a$12$triQ9MSccb8BOIbKRGPz/uIhw7C0oBolsE5AblwOWGrXPMZvG3ahS")
-//                .roles("USER")
-//                .build();
-//
-//        UserDetails adminUser = User.builder()
-//                .username("admin")
-//                .password("$2y$10$agyxsZzFAEaSNZCOIPcuPemweme/AMqDA12HqvUI/RHjbI.vCjST.")
-//                .roles("ADMIN","USER")
-//                .build();
-//        return new InMemoryUserDetailsManager(normalUser, adminUser);
-//    }
+
+    @Bean
+    public AuthenticationSuccessHandler authenticationSuccessHandler() {
+        return new CustomAuthenticationSuccessHandler();
+    }
 
 
     @Bean
-    public UserDetailsService userDetailsService(){
+    public UserDetailsService userDetailsService() {
         return myUserDetailService;
     }
 
     @Bean
-    public AuthenticationProvider authenticationProvider(){
+    public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
         authenticationProvider.setUserDetailsService(myUserDetailService);
         authenticationProvider.setPasswordEncoder(passwordEncoder());
@@ -75,7 +67,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public PasswordEncoder passwordEncoder(){
+    public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 }
